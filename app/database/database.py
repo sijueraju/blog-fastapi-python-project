@@ -30,6 +30,28 @@ def create_tables():
             role INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)
         ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS posts(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        author_id INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (author_id) REFERENCES users(id)  )       
+        ''')
+
+        cursor.execute('''
+        CREATE TABLE IF NOT EXISTS comments(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        post_id INTEGER NOT NULL,
+        author_id INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(post_id) REFERENCES posts(id),
+        FOREIGN KEY(author_id) REFERENCES users(id) )
+        ''')
         conn.commit()
 
 def init_database():

@@ -47,3 +47,14 @@ class CommentResponse(BaseModel):
     author_id : int
     author_username: str
     created_at: str
+
+class ContentGenerationRequest(BaseModel):
+    topic: str
+    tone: Optional[str] = "professional"
+    max_words: Optional[int] = 20
+    keywords: Optional[List[str]] = None
+
+class ContentGenerationResponse(BaseModel):
+    content: str
+    tokens_used: int
+    model: str

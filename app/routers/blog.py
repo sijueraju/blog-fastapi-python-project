@@ -4,9 +4,11 @@ from typing import List
 from ..database.models import *
 from ..auth import authenticate_user, get_current_user,get_password_hash, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from ..database.database import get_db, EDITOR_ROLE
+import os
+import sys
+from ..openAIService import build_prompt, generate_llm_content
 
 router = APIRouter()
-
 
 @router.post("/post/create", tags=["blog"], response_model = PostResponse)
 async def create_post(post: PostCreate, current_user: dict=Depends(get_current_user)):
@@ -60,6 +62,22 @@ async def delete_post(post_id:int, current_user: dict=Depends(get_current_user))
         cursor.execute("DELETE FROM posts where id = ?", (post_id,))
         conn.commit()
     return {"message": "Post deleted successfully"}
+
+@router.post("/post/generate", tags=["blog"], response_model = ContentGenerationResponse)
+async def generate_content(request: ContentGenerationRequest):
+    prompt = build_prompt(
+        topic=request.topic,
+        tone=request.tone,
+        max_words=request.max_words,
+        keywords=request.keywords
+    )
+
+    # Estimate tokens (rough calculation)
+    max_tokens = min(request.max_words * 2, 2000)
+
+    result = generate_llm_content(prompt, max_tokens=max_tokens)
+
+    return ContentGenerationResponse(**result)
 
 
 
